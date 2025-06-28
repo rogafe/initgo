@@ -29,13 +29,27 @@ var (
 	cfgFile string
 	rootCmd = &cobra.Command{
 		Use:   "initgo",
-		Short: "Initialize a new Go project with go mod init and main.go",
+		Short: "A CLI tool to automate Go project initialization",
 		Long: `A CLI tool to automate Go project initialization.
+
+This tool provides commands to:
+- Initialize a new Go project with go mod init and main.go
+- Create a new web application with Go Fiber, HTMX, Alpine.js, and Tailwind CSS
+
+Use 'initgo init' to create a basic Go project or 'initgo webapp' to create a full web application.`,
+	}
+
+	initCmd = &cobra.Command{
+		Use:   "init [project-name]",
+		Short: "Initialize a new Go project with go mod init and main.go",
+		Long: `Initialize a new Go project with basic setup.
 		
-This tool will:
+This command will:
 - Execute 'go mod init' with the specified project name
 - Create a main.go file with proper logging setup
-- Handle errors gracefully with informative messages`,
+- Handle errors gracefully with informative messages
+
+If no project name is provided, the current directory name will be used.`,
 		RunE: runInit,
 	}
 
@@ -86,6 +100,7 @@ func init() {
 	rootCmd.PersistentFlags().StringVar(&cfgFile, "config", "", "config file (default is $HOME/.initgo.yaml)")
 
 	// Add commands
+	rootCmd.AddCommand(initCmd)
 	rootCmd.AddCommand(webappCmd)
 	rootCmd.AddCommand(versionCmd)
 }
@@ -113,10 +128,12 @@ func initConfig() {
 
 func runInit(cmd *cobra.Command, args []string) error {
 	var projectName string
+	var createNewDir bool
 
 	// Determine project name
 	if len(args) > 0 {
 		projectName = args[0]
+		createNewDir = true
 	} else {
 		// Use current directory name as default
 		currentDir, err := os.Getwd()
@@ -124,6 +141,7 @@ func runInit(cmd *cobra.Command, args []string) error {
 			return fmt.Errorf("failed to get current directory: %w", err)
 		}
 		projectName = filepath.Base(currentDir)
+		createNewDir = false
 	}
 
 	// Validate project name
@@ -134,10 +152,36 @@ func runInit(cmd *cobra.Command, args []string) error {
 	// Clean project name (remove any invalid characters for go mod)
 	projectName = strings.TrimSpace(projectName)
 
+	if createNewDir {
+		fmt.Printf("Creating Go project '%s'...\n", projectName)
+
+		// Create project directory if it doesn't exist
+		if _, err := os.Stat(projectName); os.IsNotExist(err) {
+			if err := os.MkdirAll(projectName, 0755); err != nil {
+				return fmt.Errorf("failed to create project directory: %w", err)
+			}
+		}
+	} else {
+		fmt.Printf("Initializing Go project '%s' in current directory...\n", projectName)
+	}
+
+	// Store current directory to return to later
+	originalDir, _ := os.Getwd()
+
+	// Change to project directory if we created a new one
+	if createNewDir {
+		if err := os.Chdir(projectName); err != nil {
+			return fmt.Errorf("failed to change to project directory: %w", err)
+		}
+	}
+
 	fmt.Printf("Initializing Go module with name '%s'...\n", projectName)
 
 	// Execute go mod init
 	if err := executeGoModInit(projectName); err != nil {
+		if createNewDir {
+			os.Chdir(originalDir)
+		}
 		return fmt.Errorf("failed to initialize go module: %w", err)
 	}
 
@@ -145,10 +189,39 @@ func runInit(cmd *cobra.Command, args []string) error {
 
 	// Create main.go file
 	if err := createMainGo(projectName); err != nil {
+		if createNewDir {
+			os.Chdir(originalDir)
+		}
 		return fmt.Errorf("failed to create main.go: %w", err)
 	}
 
-	fmt.Println("Done!")
+	// Return to original directory if we created a new one
+	if createNewDir {
+		os.Chdir(originalDir)
+	}
+
+	fmt.Println("✅ Go project created successfully!")
+	if createNewDir {
+		fmt.Printf(`
+Next steps:
+1. cd %s
+2. go run main.go
+
+Your Go project is ready with:
+- go.mod file initialized
+- main.go with proper logging setup
+`, projectName)
+	} else {
+		fmt.Printf(`
+Next steps:
+1. go run main.go
+
+Your Go project '%s' is ready with:
+- go.mod file initialized
+- main.go with proper logging setup
+`, projectName)
+	}
+
 	return nil
 }
 
