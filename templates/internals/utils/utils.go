@@ -32,7 +32,7 @@ var (
 
 func InitAssets() {
 
-	log.Info("Initializing assets")
+	log.Println("Initializing assets")
 	baseAssetDir := "./assets/dist"
 	// create asset directory if it doesn't exist
 	if _, err := os.Stat(baseAssetDir); os.IsNotExist(err) {
