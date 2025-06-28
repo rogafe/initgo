@@ -22,7 +22,7 @@ jobs:
           go-version: stable
 
       - name: Run tests
-        run: go test $(go list | grep -v vendor)
+        run: go test $(go list ./... | grep -v '/templates/')
 
       - name: Check Go formatting
         run: |
@@ -33,7 +33,7 @@ jobs:
           fi
 
       - name: Run go vet
-        run: go vet ./... -exclude=./templates/...
+        run: go vet $(go list ./... | grep -v '/templates/')
 
       - name: Run go mod verify
         run: go mod verify
