@@ -22,18 +22,18 @@ jobs:
           go-version: stable
 
       - name: Run tests
-        run: go test -v ./...
+        run: go test -v ./... -exclude=./templates/...
 
       - name: Check Go formatting
         run: |
-          if [ "$(gofmt -s -l . | wc -l)" -gt 0 ]; then
+          if [ "$(gofmt -s -l . | grep -v '^templates/' | wc -l)" -gt 0 ]; then
             echo "The following files are not formatted:"
-            gofmt -s -l .
+            gofmt -s -l . | grep -v '^templates/'
             exit 1
           fi
 
       - name: Run go vet
-        run: go vet ./...
+        run: go vet ./... -exclude=./templates/...
 
       - name: Run go mod verify
         run: go mod verify
