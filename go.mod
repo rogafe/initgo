@@ -1,4 +1,4 @@
-module initgo
+module github.com/rogafe/initgo
 
 go 1.24.3
 
