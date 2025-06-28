@@ -1,0 +1,4 @@
+@import "tailwindcss";
+@source "./views/*.{html,js}";
+@plugin "daisyui";
+@plugin "flowbite/plugin";
