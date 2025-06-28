@@ -9,6 +9,9 @@ import (
 	"path/filepath"
 	"strings"
 
+	"golang.org/x/text/cases"
+	"golang.org/x/text/language"
+
 	"github.com/spf13/cobra"
 	"github.com/spf13/viper"
 )
@@ -202,7 +205,7 @@ func runWebapp(cmd *cobra.Command, args []string) error {
 	templateData := TemplateData{
 		ProjectName:   projectName,
 		ModuleName:    projectName,
-		AppTitle:      strings.Title(strings.ReplaceAll(projectName, "-", " ")),
+		AppTitle:      cases.Title(language.English).String(strings.ReplaceAll(projectName, "-", " ")),
 		AppTitleCamel: toCamelCase(projectName),
 	}
 
@@ -212,6 +215,12 @@ func runWebapp(cmd *cobra.Command, args []string) error {
 			os.Chdir(originalDir)
 		}
 		return fmt.Errorf("failed to generate files: %w", err)
+	}
+
+	// Rename .env.example to .env if it exists
+	if err := renameEnvExample(); err != nil {
+		// Don't fail the entire process if .env.example doesn't exist
+		fmt.Printf("Note: %v\n", err)
 	}
 
 	// Initialize go module if go.mod doesn't exist
