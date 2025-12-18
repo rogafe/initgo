@@ -131,11 +131,11 @@ func runInit(cmd *cobra.Command, args []string) error {
 	var createNewDir bool
 
 	// Determine project name
-	if len(args) > 0 {
+	if len(args) > 0 && args[0] != "." {
 		projectName = args[0]
 		createNewDir = true
 	} else {
-		// Use current directory name as default
+		// Use current directory name as default (also handles "." case)
 		currentDir, err := os.Getwd()
 		if err != nil {
 			return fmt.Errorf("failed to get current directory: %w", err)
@@ -151,6 +151,9 @@ func runInit(cmd *cobra.Command, args []string) error {
 
 	// Clean project name (remove any invalid characters for go mod)
 	projectName = strings.TrimSpace(projectName)
+
+	// Sanitize module name for Go module compatibility
+	moduleName := sanitizeModuleName(projectName)
 
 	if createNewDir {
 		fmt.Printf("Creating Go project '%s'...\n", projectName)
@@ -175,10 +178,10 @@ func runInit(cmd *cobra.Command, args []string) error {
 		}
 	}
 
-	fmt.Printf("Initializing Go module with name '%s'...\n", projectName)
+	fmt.Printf("Initializing Go module with name '%s'...\n", moduleName)
 
 	// Execute go mod init
-	if err := executeGoModInit(projectName); err != nil {
+	if err := executeGoModInit(moduleName); err != nil {
 		if createNewDir {
 			os.Chdir(originalDir)
 		}
@@ -230,11 +233,11 @@ func runWebapp(cmd *cobra.Command, args []string) error {
 	var createNewDir bool
 
 	// Determine project name
-	if len(args) > 0 {
+	if len(args) > 0 && args[0] != "." {
 		projectName = args[0]
 		createNewDir = true
 	} else {
-		// Use current directory name as default
+		// Use current directory name as default (also handles "." case)
 		currentDir, err := os.Getwd()
 		if err != nil {
 			return fmt.Errorf("failed to get current directory: %w", err)
@@ -250,6 +253,9 @@ func runWebapp(cmd *cobra.Command, args []string) error {
 
 	// Clean project name
 	projectName = strings.TrimSpace(projectName)
+
+	// Sanitize module name for Go module compatibility
+	moduleName := sanitizeModuleName(projectName)
 
 	if createNewDir {
 		fmt.Printf("Creating web application '%s'...\n", projectName)
@@ -277,7 +283,7 @@ func runWebapp(cmd *cobra.Command, args []string) error {
 	// Prepare template data
 	templateData := TemplateData{
 		ProjectName:   projectName,
-		ModuleName:    projectName,
+		ModuleName:    moduleName,
 		AppTitle:      cases.Title(language.English).String(strings.ReplaceAll(projectName, "-", " ")),
 		AppTitleCamel: toCamelCase(projectName),
 	}
@@ -298,8 +304,8 @@ func runWebapp(cmd *cobra.Command, args []string) error {
 
 	// Initialize go module if go.mod doesn't exist
 	if _, err := os.Stat("go.mod"); os.IsNotExist(err) {
-		fmt.Println("Initializing Go module...")
-		if err := executeGoModInit(projectName); err != nil {
+		fmt.Printf("Initializing Go module with name '%s'...\n", moduleName)
+		if err := executeGoModInit(moduleName); err != nil {
 			if createNewDir {
 				os.Chdir(originalDir)
 			}
@@ -380,10 +386,8 @@ func generateWebappFiles(data TemplateData) error {
 		}
 
 		// Get relative path from templates/
-		relPath, err := filepath.Rel("templates", path)
-		if err != nil {
-			return fmt.Errorf("failed to get relative path: %w", err)
-		}
+		// embed.FS always uses forward slashes, so we use strings.TrimPrefix
+		relPath := strings.TrimPrefix(path, "templates/")
 
 		// Determine output path
 		outputPath := relPath
@@ -392,6 +396,9 @@ func generateWebappFiles(data TemplateData) error {
 		if strings.HasSuffix(relPath, ".tmpl") {
 			outputPath = strings.TrimSuffix(relPath, ".tmpl")
 		}
+
+		// Convert forward slashes to OS-native separators for filesystem operations
+		outputPath = filepath.FromSlash(outputPath)
 
 		// Create output directory if needed
 		outputDir := filepath.Dir(outputPath)
@@ -553,6 +560,56 @@ func main() {
 	}
 
 	return nil
+}
+
+func sanitizeModuleName(name string) string {
+	// Trim whitespace
+	name = strings.TrimSpace(name)
+
+	// Handle special cases
+	if name == "" || name == "." || name == ".." {
+		// Use current directory name
+		currentDir, err := os.Getwd()
+		if err != nil {
+			return "project"
+		}
+		name = filepath.Base(currentDir)
+	}
+
+	// Replace invalid characters with hyphens
+	// Go module names can contain: letters, numbers, dots, hyphens, underscores
+	var result strings.Builder
+	lastWasHyphen := false
+	for _, r := range name {
+		if (r >= 'a' && r <= 'z') || (r >= 'A' && r <= 'Z') || (r >= '0' && r <= '9') || r == '.' || r == '-' || r == '_' {
+			result.WriteRune(r)
+			lastWasHyphen = (r == '-')
+		} else if r == ' ' || r == '/' || r == '\\' {
+			// Replace spaces and path separators with hyphens
+			if !lastWasHyphen && result.Len() > 0 {
+				result.WriteRune('-')
+				lastWasHyphen = true
+			}
+		}
+		// Skip other invalid characters
+	}
+
+	sanitized := result.String()
+
+	// Remove leading/trailing dots and hyphens
+	sanitized = strings.Trim(sanitized, ".-")
+
+	// Ensure it doesn't start with a number (Go modules can't start with numbers)
+	if len(sanitized) > 0 && sanitized[0] >= '0' && sanitized[0] <= '9' {
+		sanitized = "module-" + sanitized
+	}
+
+	// Ensure it's not empty
+	if sanitized == "" {
+		sanitized = "project"
+	}
+
+	return sanitized
 }
 
 func toCamelCase(s string) string {
