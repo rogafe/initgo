@@ -40,7 +40,7 @@ Use 'initgo init' to create a basic Go project or 'initgo webapp' to create a fu
 	}
 
 	initCmd = &cobra.Command{
-		Use:   "init [project-name]",
+		Use:   "init [project-name] [custom-name]",
 		Short: "Initialize a new Go project with go mod init and main.go",
 		Long: `Initialize a new Go project with basic setup.
 		
@@ -49,12 +49,15 @@ This command will:
 - Create a main.go file with proper logging setup
 - Handle errors gracefully with informative messages
 
-If no project name is provided, the current directory name will be used.`,
+Usage examples:
+  initgo init MyProject           Create 'MyProject' directory and init inside it
+  initgo init .                   Init in current directory using its name
+  initgo init . MyProject         Init in current directory with custom name 'MyProject'`,
 		RunE: runInit,
 	}
 
 	webappCmd = &cobra.Command{
-		Use:   "webapp [project-name]",
+		Use:   "webapp [project-name] [custom-name]",
 		Short: "Create a new web application with Go Fiber, HTMX, Alpine.js, and Tailwind CSS",
 		Long: `Create a new web application using the modern stack:
 - Go with Fiber v2 framework
@@ -65,8 +68,10 @@ If no project name is provided, the current directory name will be used.`,
 - Hot reload with Air
 - Asset bundling with esbuild
 
-If no project name is provided, the current directory name will be used
-and the application will be initialized in the current directory.`,
+Usage examples:
+  initgo webapp MyApp             Create 'MyApp' directory and init inside it
+  initgo webapp .                 Init in current directory using its name
+  initgo webapp . MyApp           Init in current directory with custom name 'MyApp'`,
 		RunE: runWebapp,
 	}
 
@@ -130,12 +135,17 @@ func runInit(cmd *cobra.Command, args []string) error {
 	var projectName string
 	var createNewDir bool
 
-	// Determine project name
+	// Determine project name and directory creation
 	if len(args) > 0 && args[0] != "." {
+		// First arg is a project name, create new directory
 		projectName = args[0]
 		createNewDir = true
+	} else if len(args) == 2 && args[0] == "." {
+		// Using ". <custom-name>" syntax - init in current dir with custom name
+		projectName = args[1]
+		createNewDir = false
 	} else {
-		// Use current directory name as default (also handles "." case)
+		// No args or just "." - use current directory name
 		currentDir, err := os.Getwd()
 		if err != nil {
 			return fmt.Errorf("failed to get current directory: %w", err)
@@ -232,12 +242,17 @@ func runWebapp(cmd *cobra.Command, args []string) error {
 	var projectName string
 	var createNewDir bool
 
-	// Determine project name
+	// Determine project name and directory creation
 	if len(args) > 0 && args[0] != "." {
+		// First arg is a project name, create new directory
 		projectName = args[0]
 		createNewDir = true
+	} else if len(args) == 2 && args[0] == "." {
+		// Using ". <custom-name>" syntax - init in current dir with custom name
+		projectName = args[1]
+		createNewDir = false
 	} else {
-		// Use current directory name as default (also handles "." case)
+		// No args or just "." - use current directory name
 		currentDir, err := os.Getwd()
 		if err != nil {
 			return fmt.Errorf("failed to get current directory: %w", err)
@@ -609,7 +624,8 @@ func sanitizeModuleName(name string) string {
 		sanitized = "project"
 	}
 
-	return sanitized
+	// Convert to lowercase for Go module naming convention
+	return strings.ToLower(sanitized)
 }
 
 func toCamelCase(s string) string {
