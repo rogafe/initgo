@@ -6,6 +6,10 @@ import (
 
 // GetIndex handles the main page request
 func GetIndex(c *fiber.Ctx) error {
-
 	return c.Render("index", fiber.Map{})
+}
+
+// GetStackPreview renders a small HTMX partial.
+func GetStackPreview(c *fiber.Ctx) error {
+	return c.Render("partials/stack_preview", fiber.Map{}, "layouts/no_layout")
 }

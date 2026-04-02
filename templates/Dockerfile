@@ -3,7 +3,7 @@ FROM node:20-alpine AS frontend
 WORKDIR /app
 
 # Install pnpm
-RUN npm install -g pnpm
+RUN npm install -g pnpm@10.33.0
 
 # Copy package files and install dependencies
 COPY package.json pnpm-lock.yaml* ./
@@ -12,7 +12,7 @@ RUN pnpm install
 # Copy frontend source files
 COPY . .
 
-RUN pnpm approve-builds 
+RUN pnpm approve-builds
 # Build frontend assets
 RUN pnpm run build:css
 RUN pnpm run build:js

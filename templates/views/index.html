@@ -1,5 +1,157 @@
-<div class="flex flex-col gap-8">
-</div>
+<section class="grid gap-8 lg:grid-cols-[1.15fr_0.85fr] lg:items-center">
+  <div class="space-y-6">
+    <div class="badge badge-primary badge-outline badge-lg">Modern Go Webapp Starter</div>
+    <div class="space-y-4">
+      <h1 class="max-w-3xl text-5xl font-black tracking-tight text-balance sm:text-6xl">
+        Ship your next Go product with a polished default front door.
+      </h1>
+      <p class="max-w-2xl text-lg leading-8 text-base-content/75">
+        {{appTitle}} gives you a clean Fiber setup, HTMX-driven interactions, Alpine for light state,
+        and a modern Tailwind/DaisyUI interface without the usual starter-template clutter.
+      </p>
+    </div>
+    <div class="flex flex-col gap-3 sm:flex-row">
+      <a href="#launch" class="btn btn-primary btn-lg">Start Building</a>
+      <a href="#stack" class="btn btn-outline btn-lg">Explore The Stack</a>
+    </div>
+    <div class="flex flex-wrap gap-3 text-sm text-base-content/65">
+      <span class="badge badge-neutral badge-outline">Fiber</span>
+      <span class="badge badge-neutral badge-outline">HTMX</span>
+      <span class="badge badge-neutral badge-outline">Alpine</span>
+      <span class="badge badge-neutral badge-outline">Tailwind v4</span>
+      <span class="badge badge-neutral badge-outline">DaisyUI</span>
+    </div>
+  </div>
 
-<script>
-</script>
+  <div class="rounded-[2rem] border border-base-300/60 bg-base-100/90 p-4 shadow-2xl shadow-primary/10 backdrop-blur">
+    <div class="rounded-[1.5rem] bg-neutral text-neutral-content">
+      <div class="flex items-center gap-2 border-b border-white/10 px-5 py-4 text-xs uppercase tracking-[0.3em] text-neutral-content/60">
+        <span class="size-2 rounded-full bg-success"></span>
+        <span>Launch Preview</span>
+      </div>
+      <div class="space-y-6 p-5">
+        <div class="space-y-3">
+          <p class="text-sm text-neutral-content/70">Default experience</p>
+          <div class="grid gap-3 sm:grid-cols-3">
+            <div class="rounded-2xl bg-white/5 p-4">
+              <p class="text-3xl font-black">0</p>
+              <p class="text-sm text-neutral-content/70">setup friction</p>
+            </div>
+            <div class="rounded-2xl bg-white/5 p-4">
+              <p class="text-3xl font-black">3</p>
+              <p class="text-sm text-neutral-content/70">core layers</p>
+            </div>
+            <div class="rounded-2xl bg-white/5 p-4">
+              <p class="text-3xl font-black">1</p>
+              <p class="text-sm text-neutral-content/70">clean foundation</p>
+            </div>
+          </div>
+        </div>
+
+        <div x-data="{ tab: 'build' }" class="space-y-4">
+          <div class="flex flex-wrap gap-2">
+            <button class="btn btn-sm" :class="tab === 'build' ? 'btn-primary' : 'btn-ghost'" @click="tab = 'build'">Build</button>
+            <button class="btn btn-sm" :class="tab === 'ship' ? 'btn-primary' : 'btn-ghost'" @click="tab = 'ship'">Ship</button>
+            <button class="btn btn-sm" :class="tab === 'scale' ? 'btn-primary' : 'btn-ghost'" @click="tab = 'scale'">Scale</button>
+          </div>
+
+          <div class="rounded-2xl bg-white/5 p-4 text-sm leading-7 text-neutral-content/80">
+            <p x-show="tab === 'build'" x-cloak>Start from a better first impression: hero, sections, theme toggle, and a stack-aware layout.</p>
+            <p x-show="tab === 'ship'" x-cloak>Keep interactions simple with HTMX and Alpine instead of reaching for a full SPA by default.</p>
+            <p x-show="tab === 'scale'" x-cloak>Extend the structure into auth, dashboards, or product marketing pages without rewriting the shell.</p>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section id="features" class="mt-16 grid gap-4 md:grid-cols-3">
+  <article class="card border border-base-300/60 bg-base-100 shadow-sm">
+    <div class="card-body gap-3">
+      <div class="badge badge-secondary badge-outline">Server-first</div>
+      <h2 class="card-title text-2xl">Fiber templates that stay simple</h2>
+      <p class="text-base-content/70">A clean layout, partials, and handlers structure gives you room to grow without forcing an overbuilt architecture.</p>
+    </div>
+  </article>
+  <article class="card border border-base-300/60 bg-base-100 shadow-sm">
+    <div class="card-body gap-3">
+      <div class="badge badge-accent badge-outline">Interactive</div>
+      <h2 class="card-title text-2xl">HTMX where the UX needs it</h2>
+      <p class="text-base-content/70">Use server-rendered fragments for live sections and keep browser code focused on small, intentional interactions.</p>
+    </div>
+  </article>
+  <article class="card border border-base-300/60 bg-base-100 shadow-sm">
+    <div class="card-body gap-3">
+      <div class="badge badge-primary badge-outline">Stylish</div>
+      <h2 class="card-title text-2xl">Modern visual defaults</h2>
+      <p class="text-base-content/70">DaisyUI and Tailwind v4 provide a polished baseline so the generated app feels launch-ready instead of placeholder-heavy.</p>
+    </div>
+  </article>
+</section>
+
+<section id="stack" class="mt-16 grid gap-6 lg:grid-cols-[0.9fr_1.1fr]">
+  <div class="space-y-4">
+    <p class="text-sm font-semibold uppercase tracking-[0.3em] text-primary">Stack Overview</p>
+    <h2 class="text-3xl font-bold">A pragmatic stack for fast product work.</h2>
+    <p class="max-w-xl text-base-content/75">
+      This starter keeps the build chain small, the rendering model obvious, and the visual system modern.
+      You can move from landing page to dashboard to authenticated app without swapping frameworks.
+    </p>
+    <div class="grid gap-3 sm:grid-cols-2">
+      <div class="rounded-2xl border border-base-300/60 bg-base-100 p-4">
+        <p class="text-sm text-base-content/60">Rendering</p>
+        <p class="mt-2 text-lg font-semibold">Fiber + HTML templates</p>
+      </div>
+      <div class="rounded-2xl border border-base-300/60 bg-base-100 p-4">
+        <p class="text-sm text-base-content/60">Interaction</p>
+        <p class="mt-2 text-lg font-semibold">HTMX + Alpine</p>
+      </div>
+      <div class="rounded-2xl border border-base-300/60 bg-base-100 p-4">
+        <p class="text-sm text-base-content/60">Styling</p>
+        <p class="mt-2 text-lg font-semibold">Tailwind + DaisyUI</p>
+      </div>
+      <div class="rounded-2xl border border-base-300/60 bg-base-100 p-4">
+        <p class="text-sm text-base-content/60">Bundling</p>
+        <p class="mt-2 text-lg font-semibold">esbuild + pnpm</p>
+      </div>
+    </div>
+  </div>
+
+  <div class="rounded-[2rem] border border-base-300/60 bg-base-200/70 p-6">
+    <div class="mb-4 flex items-center justify-between gap-3">
+      <div>
+        <p class="text-sm font-semibold uppercase tracking-[0.3em] text-base-content/50">HTMX Demo</p>
+        <h3 class="text-2xl font-bold">Load a server-rendered preview</h3>
+      </div>
+      <button
+        class="btn btn-primary"
+        hx-get="/stack-preview"
+        hx-target="#stack-preview"
+        hx-swap="innerHTML"
+      >
+        Show Preview
+      </button>
+    </div>
+    <div id="stack-preview" class="min-h-56 rounded-[1.5rem] border border-dashed border-base-300 bg-base-100 p-5">
+      <div class="flex h-full flex-col items-start justify-center gap-3 text-base-content/60">
+        <span class="badge badge-outline">Server-rendered fragment</span>
+        <p class="max-w-md text-lg">Click the button to load a partial from the Go backend and preview how HTMX fits into the starter.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section id="launch" class="mt-16 rounded-[2rem] border border-primary/15 bg-primary/8 p-8">
+  <div class="flex flex-col gap-6 lg:flex-row lg:items-end lg:justify-between">
+    <div class="space-y-3">
+      <p class="text-sm font-semibold uppercase tracking-[0.3em] text-primary">Ready To Launch</p>
+      <h2 class="max-w-2xl text-3xl font-bold">Start with a starter that already looks intentional.</h2>
+      <p class="max-w-2xl text-base-content/75">Use this landing page as-is, or treat it as a stronger baseline for docs, auth flows, dashboards, and marketing pages.</p>
+    </div>
+    <div class="flex flex-col gap-3 sm:flex-row">
+      <a href="https://gofiber.io" class="btn btn-primary btn-wide">Fiber Docs</a>
+      <a href="https://htmx.org" class="btn btn-outline btn-wide">HTMX Docs</a>
+    </div>
+  </div>
+</section>

@@ -10,5 +10,4 @@ Alpine.start();
 
 
 
-// You can add your custom JavaScript code here
-console.log('Application initialized'); 
+document.body.dataset.js = 'ready';

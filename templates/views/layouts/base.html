@@ -3,9 +3,8 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>{{projectName}}</title>
-    
-    <!-- Theme initialization script - must be before any styles -->
+    <title>{{appTitle}}</title>
+
     <script>
         (function() {
             function getCookie(name) {
@@ -13,76 +12,30 @@
                 const parts = value.split(`; ${name}=`);
                 if (parts.length === 2) return parts.pop().split(';').shift();
             }
+
             const theme = getCookie('theme') || 'light';
             document.documentElement.setAttribute('data-theme', theme);
         })();
     </script>
-    
-    <!-- Bundled JavaScript -->
+
     <script src="/assets/bundle.js" defer></script>
-
-    <!-- Styles -->
     <link rel="stylesheet" href="/assets/styles.css">
-    
-    <style>
-        :root[data-theme="light"] {
-            --bg-color: #f7f8fa;
-            --text-color: #333;
-            --nav-bg: #ffffff;
-            --nav-text: #333;
-            --nav-shadow: 0 1px 3px 0 rgba(0, 0, 0, 0.1);
-        }
 
-        :root[data-theme="dark"] {
-            --bg-color: #1a1a1a;
-            --text-color: #ffffff;
-            --nav-bg: #2d2d2d;
-            --nav-text: #ffffff;
-            --nav-shadow: 0 1px 3px 0 rgba(0, 0, 0, 0.3);
-        }
-
-        body {
-            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
-            line-height: 1.6;
-            color: var(--text-color);
-            background-color: var(--bg-color);
-            transition: background-color 0.3s, color 0.3s;
-        }
-
-        .container {
-            max-width: 1200px;
-            margin: 0 auto;
-        }
-
-        .theme-toggle {
-            background: none;
-            border: none;
-            cursor: pointer;
-            padding: 0.5rem;
-            color: var(--nav-text);
-            display: flex;
-            align-items: center;
-            gap: 0.5rem;
-        }
-
-        .theme-toggle:hover {
-            opacity: 0.8;
-        }
-    </style>
-
-    <!-- Alpine.js cloak -->
     <style>
         [x-cloak] { display: none !important; }
     </style>
 </head>
-<body class="min-h-screen">
-    <main class="max-w-7xl mx-auto py-6 sm:px-6 lg:px-8">
-        {{template "partials/headers" .}}
-        <div class="flex-grow">
-            {{embed}}
-        </div>
-        {{template "partials/footers" .}}
-    </main>
+<body class="min-h-screen bg-base-100 text-base-content antialiased">
+    <div class="relative isolate overflow-hidden">
+        <div class="absolute inset-x-0 top-0 -z-10 h-96 bg-[radial-gradient(circle_at_top,oklch(var(--p)/0.18),transparent_55%)]"></div>
+        <main class="mx-auto flex min-h-screen w-full max-w-7xl flex-col px-4 py-6 sm:px-6 lg:px-8">
+            {{template "partials/headers" .}}
+            <div class="flex-1">
+                {{embed}}
+            </div>
+            {{template "partials/footers" .}}
+        </main>
+    </div>
 
     <script>
         function getCookie(name) {
@@ -91,30 +44,31 @@
             if (parts.length === 2) return parts.pop().split(';').shift();
         }
 
-        function setTheme(theme) {
-            document.documentElement.setAttribute('data-theme', theme);
-            const lightIcon = document.querySelector('.light-icon');
-            const darkIcon = document.querySelector('.dark-icon');
-            if (theme === 'dark') {
-                lightIcon.style.display = 'none';
-                darkIcon.style.display = 'inline';
-            } else {
-                lightIcon.style.display = 'inline';
-                darkIcon.style.display = 'none';
-            }
+        function syncThemeToggle(theme) {
+            document.querySelectorAll('[data-theme-label]').forEach((label) => {
+                label.textContent = theme === 'dark' ? 'Dark' : 'Light';
+            });
+
+            document.querySelectorAll('[data-theme-icon-sun]').forEach((icon) => {
+                icon.classList.toggle('hidden', theme === 'dark');
+            });
+
+            document.querySelectorAll('[data-theme-icon-moon]').forEach((icon) => {
+                icon.classList.toggle('hidden', theme !== 'dark');
+            });
         }
 
         function toggleTheme() {
-            const currentTheme = getCookie('theme') || 'light';
-            const newTheme = currentTheme === 'light' ? 'dark' : 'light';
-            setTheme(newTheme);
+            const currentTheme = getCookie('theme') || document.documentElement.getAttribute('data-theme') || 'light';
+            const nextTheme = currentTheme === 'light' ? 'dark' : 'light';
+
+            document.documentElement.setAttribute('data-theme', nextTheme);
+            syncThemeToggle(nextTheme);
         }
 
-        // Set initial theme
         document.addEventListener('DOMContentLoaded', () => {
-            const theme = getCookie('theme') || 'light';
-            setTheme(theme);
+            syncThemeToggle(document.documentElement.getAttribute('data-theme') || 'light');
         });
     </script>
 </body>
-</html> 
+</html>

@@ -20,11 +20,9 @@ func init() {
 	log.SetPrefix("{{projectName}}: ")
 	log.SetOutput(os.Stdout)
 
-	// if ENV is set to dev use godotenv
-	env := os.Getenv("ENV")
-	env = strings.ToLower(env)
+	env := strings.ToLower(strings.TrimSpace(os.Getenv("ENV")))
 	log.Println("ENV: ", env)
-	if strings.Contains(env, "dev") {
+	if env == "dev" || env == "development" {
 		log.Println("Loading .env file")
 		err := godotenv.Load()
 		if err != nil {
@@ -55,11 +53,17 @@ func main() {
 
 	// Theme toggle route
 	app.Post("/theme/toggle", handlers.ToggleTheme)
+	app.Get("/stack-preview", handlers.GetStackPreview)
 
 	// Auth routes (no middleware)
 
 	app.Get("/", handlers.GetIndex)
 
+	port := strings.TrimSpace(os.Getenv("PORT"))
+	if port == "" {
+		port = "3000"
+	}
+
 	// Start server
-	log.Fatal(app.Listen(":3000"))
+	log.Fatal(app.Listen(":" + port))
 }

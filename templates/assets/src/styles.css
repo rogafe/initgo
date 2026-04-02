@@ -1,4 +1,8 @@
 @import "tailwindcss";
-@source "./views/*.{html,js}";
+@source "./views/**/*.html";
 @plugin "daisyui";
 @plugin "flowbite/plugin";
+
+@theme {
+  --radius-box: 1rem;
+}

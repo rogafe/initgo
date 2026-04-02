@@ -360,7 +360,7 @@ Next steps:
 1. cd %s
 2. pnpm run dev (in one terminal - for asset building)
 3. air (in another terminal - for Go hot reload)
-4. Open http://localhost:3000
+4. Open the app on the port configured in .env (default 3000)
 
 Your web application is ready with:
 - Go Fiber v2 backend
@@ -373,7 +373,7 @@ Your web application is ready with:
 Next steps:
 1. pnpm run dev (in one terminal - for asset building)
 2. air (in another terminal - for Go hot reload)
-3. Open http://localhost:3000
+3. Open the app on the port configured in .env (default 3000)
 
 Your web application '%s' is ready with:
 - Go Fiber v2 backend
